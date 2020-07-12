@@ -1,0 +1,90 @@
+version: '3'
+services:
+  zookeeper:
+    image: zookeeper
+    networks:
+      - fz-ms-network
+    ports: 
+##        2181 2888 3888 8080
+      - "2181:2181"
+      - "2888:2888"
+      - "3888:3888"
+      - "8080:8080"
+    restart: on-failure
+## Configuration to use in swarm 
+#    deploy:
+#      restart_policy:
+#        condition: on-failure
+
+  zookeeperweb:
+    image: elkozmon/zoonavigator:latest
+    ports:
+      - "8090:9000"
+    restart: unless-stopped
+    networks:
+      - fz-ms-network
+  
+  axonserver:
+    image: axoniq/axonserver:latest
+    ports:
+      - "8024:8024"
+  
+  musicservice:
+    image: com.fz.ms/music-service:0.0.1-SNAPSHOT
+    ports:
+      - "8091"
+    environment:
+      - JAVA_OPTS=
+        -DDISCOVERY_SERVER=http://zookeeper:2181
+    
+volumes: 
+  fz-ms-volume: 
+networks: 
+  fz-ms-network: 
+#  eurekaserver:
+#    image: com.fzmicro1/eurekaserver:0.0.1
+#    ports:
+#      - 9091:9091
+#  configserver:
+#    image: com.fzmicro1/configserver:0.0.1
+#    ports:
+#      - 9090:9090
+#    environment:
+#      - JAVA_OPTS=
+#        -DEUREKA_SERVER=http://eurekaserver:9091/eureka
+#        -Dspring.cloud.config.server.native.searchLocations=/var/config-data
+#    depends_on:
+#      - eurekaserver
+#  gatewayserver:
+#    image: com.fzmicro1/gatewayserver:0.0.1
+#    ports:
+#      - 9999:9999
+#    environment:
+#      - JAVA_OPTS=
+#        -DEUREKA_SERVER=http://eurekaserver:9091/eureka
+#    depends_on:
+#      - eurekaserver
+#      - configserver
+#  customerservice:
+#    image: com.fzmicro1/customerservice:0.0.1
+#    ports: 
+#      - 9092:9092
+#    environment:
+#      - JAVA_OPTS=
+#        -DEUREKA_SERVER=http://eurekaserver:9091/eureka
+#    depends_on:
+#      - eurekaserver
+#      - gatewayserver
+#      - configserver
+#  vendorservice:
+#    image: com.fzmicro1/vendorservice:0.0.1
+#    ports: 
+#      - 9093:9093
+#    environment:
+#      - JAVA_OPTS=
+#        -DEUREKA_SERVER=http://eurekaserver:9091/eureka
+#    depends_on:
+#      - eurekaserver
+#      - gatewayserver
+#      - configserver
+    

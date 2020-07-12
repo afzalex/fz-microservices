@@ -1,0 +1,6 @@
+spring:
+  application: 
+    name: musicservice
+  cloud:
+    zookeeper:
+      connect-string: http://${DISCOVERY_SERVER:localhost:2181}
